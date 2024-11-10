@@ -2,6 +2,7 @@ import {
 	ActionIcon,
 	Button,
 	Container,
+	Grid,
 	Group,
 	Loader,
 	rem,
@@ -14,7 +15,7 @@ import {
 } from "@mantine/core";
 import { type LoaderFunction, type MetaFunction, json } from "@remix-run/node";
 import { type RefObject, useEffect, useRef, useState } from "react";
-import { Link, useLoaderData, useParams } from "@remix-run/react";
+import { Link, useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { IconSend, IconTrash } from "@tabler/icons-react";
 import useSWR from "swr";
 
@@ -85,6 +86,7 @@ function ChatContainer({
 
 export default function Index() {
 	const params = useParams();
+	const navigate = useNavigate();
 	const chatDetail = useLoaderData() as
 		| Awaited<ReturnType<typeof getSession>>
 		| undefined;
@@ -152,24 +154,36 @@ export default function Index() {
 			});
 	}
 
+	function handleDelete() {
+		navigate(`/chats/${chatDetail?.chat_sessions.id}/destroy`);
+	}
+
 	return (
 		<Container>
-			<Group justify="space-between" mt="md">
-				<Stack gap="xs">
-					<Title order={4}>{chatDetail.chat_sessions.title}</Title>
-					<Text>
-						Context:{" "}
-						<Link to={`/papers/${chatDetail.research_articles.id}`}>
-							{chatDetail.research_articles.title}
-						</Link>
-					</Text>
-				</Stack>
-				<Group>
-					<Button color="red" leftSection={<IconTrash />}>
+			<Grid mt="md">
+				<Grid.Col span={10}>
+					<Stack gap="xs">
+						<Title order={4}>
+							{chatDetail.chat_sessions.icon} {chatDetail.chat_sessions.title}
+						</Title>
+						<Text>
+							Context:{" "}
+							<Link to={`/papers/${chatDetail.research_articles.id}`}>
+								{chatDetail.research_articles.title}
+							</Link>
+						</Text>
+					</Stack>
+				</Grid.Col>
+				<Grid.Col span={2}>
+					<Button
+						color="red"
+						leftSection={<IconTrash />}
+						onClick={handleDelete}
+					>
 						Delete session
 					</Button>
-				</Group>
-			</Group>
+				</Grid.Col>
+			</Grid>
 
 			<ChatContainer
 				data={data}
