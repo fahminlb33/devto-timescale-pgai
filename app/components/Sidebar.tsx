@@ -8,6 +8,8 @@ import {
 	Group,
 	rem,
 	Flex,
+	Tooltip,
+	ActionIcon,
 } from "@mantine/core";
 import {
 	IconBooks,
@@ -15,6 +17,7 @@ import {
 	IconSearch,
 	IconChartBar,
 	IconHome,
+	IconRefresh,
 } from "@tabler/icons-react";
 
 import { elipsisText } from "~/services/utils";
@@ -23,14 +26,11 @@ import type { ListChatSessionsResponse } from "~/.server/services/chats";
 import classes from "./Sidebar.module.css";
 
 interface ChatHistoryProps {
-	query: string;
+	isLoading: boolean;
+	data: ListChatSessionsResponse | undefined;
 }
 
-function ChatHistory({ query }: ChatHistoryProps) {
-	const { data, isLoading } = useSWR<ListChatSessionsResponse>(
-		`/api/chats?q=${query}&page=1&size=10`,
-	);
-
+function ChatHistory({ isLoading, data }: ChatHistoryProps) {
 	if (isLoading) {
 		return (
 			<Flex justify="center" align="center">
@@ -72,7 +72,11 @@ const links = [
 ];
 
 export function Sidebar() {
-	const [searchQuery, setSearchQuery] = useDebouncedState("", 200);
+	const [searchQuery, setSearchQuery] = useDebouncedState("", 400);
+	const { data, isLoading, mutate } = useSWR<ListChatSessionsResponse>(
+		`/api/chats?q=${searchQuery}&page=1&size=10`,
+	);
+
 	const mainLinks = links.map((link) => (
 		<UnstyledButton
 			key={link.label}
@@ -87,6 +91,10 @@ export function Sidebar() {
 		</UnstyledButton>
 	));
 
+	function handleRefresh() {
+		mutate();
+	}
+
 	return (
 		<nav className={classes.navbar}>
 			<div className={classes.section} style={{ marginTop: "0.4rem" }}>
@@ -98,6 +106,15 @@ export function Sidebar() {
 					<Text size="xs" fw={500} c="dimmed">
 						Your chat sessions
 					</Text>
+					<Tooltip label="Refresh sessions" withArrow position="right">
+						<ActionIcon variant="default" size={18}>
+							<IconRefresh
+								style={{ width: rem(12), height: rem(12) }}
+								stroke={1.5}
+								onClick={handleRefresh}
+							/>
+						</ActionIcon>
+					</Tooltip>
 				</Group>
 				<TextInput
 					m="md"
@@ -113,7 +130,7 @@ export function Sidebar() {
 					styles={{ section: { pointerEvents: "none" } }}
 				/>
 
-				<ChatHistory query={searchQuery} />
+				<ChatHistory isLoading={isLoading} data={data} />
 			</div>
 		</nav>
 	);
