@@ -50,7 +50,7 @@ function ChatHistory({ query }: ChatHistoryProps) {
 	const collectionLinks = data.data.map((collection) => (
 		<UnstyledButton
 			component={Link}
-			to={`/chat/${collection.id}`}
+			to={`/chats/${collection.id}`}
 			key={collection.id}
 			className={classes.collectionLink}
 		>

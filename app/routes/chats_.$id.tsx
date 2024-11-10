@@ -12,11 +12,12 @@ import {
 	TextInput,
 	Title,
 } from "@mantine/core";
-import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { type LoaderFunction, type MetaFunction, json } from "@remix-run/node";
+import { type RefObject, useEffect, useRef, useState } from "react";
+import { Link, useLoaderData, useParams } from "@remix-run/react";
 import { IconSend, IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
 import useSWR from "swr";
+
 import { getSession } from "~/.server/services/chats";
 import ChatItem from "~/components/ChatItem";
 
@@ -51,17 +52,18 @@ type ChatResponse = {
 function ChatContainer({
 	data,
 	isLoading,
-}: { data: ChatResponse | undefined; isLoading: boolean }) {
+	viewportRef,
+}: {
+	data: ChatResponse | undefined;
+	isLoading: boolean;
+	viewportRef: RefObject<HTMLDivElement>;
+}) {
 	if (isLoading) {
 		return <Loader />;
 	}
 
 	if (!data) {
 		return <Text>No data.</Text>;
-	}
-
-	for (const x of data.data) {
-		console.log({ id: x.id, role: x.role, ts: x.createdAt });
 	}
 
 	const chats = data.data.map((x) => (
@@ -75,7 +77,7 @@ function ChatContainer({
 	));
 
 	return (
-		<ScrollArea h="65dvh" my="xl">
+		<ScrollArea h="65dvh" my="xl" viewportRef={viewportRef}>
 			<Stack my="xl">{chats}</Stack>
 		</ScrollArea>
 	);
@@ -89,13 +91,27 @@ export default function Index() {
 	const { data, isLoading, mutate } = useSWR<ChatResponse>(
 		`/api/chats/${params.id}`,
 	);
+
+	const viewportRef = useRef<HTMLDivElement>(null);
 	const [message, setMessage] = useState("");
+	const [inputDisabled, setInputDisabled] = useState(false);
 
 	if (!chatDetail) {
 		return <Text>The chat session is invalid.</Text>;
 	}
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: to update after every message
+	useEffect(() => {
+		if (viewportRef.current) {
+			viewportRef.current.scrollTo({
+				top: viewportRef.current.scrollHeight,
+				behavior: "smooth",
+			});
+		}
+	}, [data]);
+
 	function send() {
+		setInputDisabled(true);
 		fetch(`/api/chats/${params.id}`, {
 			method: "post",
 			body: JSON.stringify({
@@ -126,8 +142,14 @@ export default function Index() {
 					);
 
 					mutate(copyData);
+					setMessage("");
+					setInputDisabled(false);
 				},
-			);
+			)
+			.catch((e) => {
+				console.error(e);
+				setInputDisabled(false);
+			});
 	}
 
 	return (
@@ -135,7 +157,12 @@ export default function Index() {
 			<Group justify="space-between" mt="md">
 				<Stack gap="xs">
 					<Title order={4}>{chatDetail.chat_sessions.title}</Title>
-					<Text>Context: {chatDetail.research_articles.title}</Text>
+					<Text>
+						Context:{" "}
+						<Link to={`/papers/${chatDetail.research_articles.id}`}>
+							{chatDetail.research_articles.title}
+						</Link>
+					</Text>
 				</Stack>
 				<Group>
 					<Button color="red" leftSection={<IconTrash />}>
@@ -144,11 +171,15 @@ export default function Index() {
 				</Group>
 			</Group>
 
-			<ChatContainer data={data} isLoading={isLoading} />
+			<ChatContainer
+				data={data}
+				isLoading={isLoading}
+				viewportRef={viewportRef}
+			/>
 
 			<TextInput
 				w={"100%"}
-				disabled={isLoading}
+				disabled={isLoading || inputDisabled}
 				size="xl"
 				radius="xl"
 				placeholder="Ask me"

@@ -1,3 +1,4 @@
+import { v4 as uuid } from "uuid";
 import { count, desc, eq, ilike, sql } from "drizzle-orm";
 
 import db from "../db";
@@ -91,6 +92,26 @@ export async function getSession(sessionId: string) {
 	}
 
 	return session[0];
+}
+
+export async function createSession({
+	icon,
+	title,
+	paperId,
+}: { icon: string; title: string; paperId: string }) {
+	const result = await db
+		.insert(chatSessionTable)
+		.values({
+			id: uuid(),
+			icon: icon,
+			title: title,
+			paperId: paperId,
+			createdAt: new Date(),
+			modifiedAt: new Date(),
+		})
+		.returning();
+
+	return result[0];
 }
 
 export async function destroySession(sessionId: string) {

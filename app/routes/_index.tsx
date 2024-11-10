@@ -52,7 +52,7 @@ export default function Index() {
 		}
 
 		const items = data.map((x) => (
-			<UnstyledButton key={x.id} component={Link} to={`/chat/${x.id}`}>
+			<UnstyledButton key={x.id} component={Link} to={`/chats/${x.id}`}>
 				<span style={{ marginRight: rem(9), fontSize: rem(16) }}>{x.icon}</span>{" "}
 				{elipsisText(x.title, 50)}
 			</UnstyledButton>

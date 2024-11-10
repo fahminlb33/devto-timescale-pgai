@@ -57,6 +57,7 @@ export default function Index() {
 							component={Link}
 							to={data.url}
 							variant="outline"
+							target="_blank"
 							leftSection={<IconLink />}
 						>
 							Visit Paper Page
@@ -65,6 +66,7 @@ export default function Index() {
 							component={Link}
 							to={data.pdfUrl}
 							variant="outline"
+							target="_blank"
 							leftSection={<IconDownload />}
 						>
 							Download PDF
