@@ -92,35 +92,6 @@ function Table() {
 				{ accessor: "authors" },
 				{ accessor: "publisher" },
 				{
-					accessor: "actions_ai",
-					title: "AI",
-					width: rem(80),
-					render: ({ id }) => (
-						<Group gap={0}>
-							<Tooltip label="Chat with this paper">
-								<ActionIcon
-									variant="subtle"
-									color="blue"
-									component={Link}
-									to={`/papers/${id}/chat`}
-								>
-									<IconMessage size={18} />
-								</ActionIcon>
-							</Tooltip>
-							<Tooltip label="Build knowledge graph with this paper">
-								<ActionIcon
-									variant="subtle"
-									color="blue"
-									component={Link}
-									to={`/papers/${id}/graph`}
-								>
-									<IconAffiliate size={18} />
-								</ActionIcon>
-							</Tooltip>
-						</Group>
-					),
-				},
-				{
 					accessor: "actions_this_paper",
 					title: "This Paper",
 					width: rem(110),
@@ -170,9 +141,19 @@ function Table() {
 				{
 					accessor: "actions",
 					title: "Actions",
-					width: rem(80),
+					width: rem(110),
 					render: ({ id }) => (
 						<Group gap={0}>
+							<Tooltip label="Chat with this paper">
+								<ActionIcon
+									variant="subtle"
+									color="blue"
+									component={Link}
+									to={`/papers/${id}/chat`}
+								>
+									<IconMessage size={18} />
+								</ActionIcon>
+							</Tooltip>
 							<Tooltip label="Show paper details">
 								<ActionIcon
 									variant="subtle"

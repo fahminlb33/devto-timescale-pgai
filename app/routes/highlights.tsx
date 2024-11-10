@@ -1,6 +1,5 @@
 import {
 	ActionIcon,
-	Button,
 	Container,
 	Flex,
 	Group,
@@ -11,12 +10,10 @@ import {
 	Text,
 	TextInput,
 	Title,
-	TypographyStylesProvider,
 } from "@mantine/core";
 import {
 	IconAffiliate,
 	IconMessage,
-	IconSearch,
 	IconSend,
 	IconSparkles,
 } from "@tabler/icons-react";
@@ -67,13 +64,6 @@ function ResultSet() {
 						to={`/papers/${x.paper_id}/chat`}
 					>
 						<IconMessage />
-					</ActionIcon>
-					<ActionIcon
-						variant="subtle"
-						component={Link}
-						to={`/papers/${x.paper_id}/graph`}
-					>
-						<IconAffiliate />
 					</ActionIcon>
 				</Group>
 			</Group>
