@@ -176,6 +176,7 @@ $$;
 DROP PROCEDURE IF EXISTS chat_with_paper;
 CREATE OR REPLACE PROCEDURE chat_with_paper(p_session_id VARCHAR(36), p_chat_content TEXT) LANGUAGE plpgsql AS $$
 DECLARE
+    v_paper_id          VARCHAR(36);
     v_question          TEXT;
     v_context           TEXT;
 	v_chats				JSONB;
@@ -192,6 +193,10 @@ BEGIN
             embedding <=> ai.openai_embed('text-embedding-3-small', v_question, dimensions => 768) AS distance
         FROM
             research_articles_embeddings
+        INNER JOIN
+            chat_sessions ON chat_sessions.paper_id = research_articles_embeddings.id
+        WHERE
+            chat_sessions.id = p_session_id
         ORDER BY
             distance
         LIMIT 5
