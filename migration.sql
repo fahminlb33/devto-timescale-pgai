@@ -30,7 +30,7 @@ DROP TABLE IF EXISTS chat_sessions;
 CREATE TABLE chat_sessions (
     id              VARCHAR(36)     PRIMARY KEY,
     paper_id        VARCHAR(36)     NOT NULL REFERENCES research_articles (id) ON DELETE CASCADE,
-    icon            CHAR(1)         NOT NULL,
+    icon            VARCHAR(10)         NOT NULL,
     title           TEXT            NOT NULL,
     created_at      TIMESTAMP       NOT NULL,
     modified_at     TIMESTAMP       NOT NULL
