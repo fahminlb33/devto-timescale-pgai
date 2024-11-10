@@ -1,0 +1,72 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    networks:
+      - kawanpaper
+
+  postgres:
+    image: timescale/timescaledb-ha:pg16
+    env_file:
+      - docker.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/home/postgres/pgdata/data
+    networks:
+      - kawanpaper
+
+  vectorizer-worker:
+    image: timescale/pgai-vectorizer-worker:0.1.0
+    command: ["-c", "1"]
+    restart: unless-stopped
+    env_file:
+      - docker.env
+    networks:
+      - kawanpaper
+
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   tty: true
+  #   env_file:
+  #     - docker.env
+  #   ports:
+  #     - 7869:11434
+  #   volumes:
+  #     - ollama:/root/.ollama
+  #   networks:
+  #     - kawanpaper
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+
+  minio:
+    image: quay.io/minio/minio:latest
+    command: server /data --console-address ":9001"
+    env_file:
+      - docker.env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio:/data
+    networks:
+      - kawanpaper
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  kawanpaper:
+
+volumes:
+  postgres:
+  ollama:
+  minio:
