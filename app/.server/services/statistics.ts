@@ -1,3 +1,4 @@
+import { sum } from "drizzle-orm";
 import db from "../db";
 import {
 	researchArticleTable,
@@ -6,10 +7,17 @@ import {
 } from "../db/schema";
 
 export async function getSummaryStats() {
+	const stats = await db
+		.select({
+			chatsTotal: sum(chatSessionsSummaryView.totalChats),
+			tokensTotal: sum(chatSessionsSummaryView.totalTokens),
+		})
+		.from(chatSessionsSummaryView);
+
 	return {
 		paperCount: await db.$count(researchArticleTable),
 		chatSessionsCount: await db.$count(chatSessionTable),
-		totalChatsCount: await db.$count(chatSessionsSummaryView),
-		totalTokensCount: await db.$count(chatSessionsSummaryView),
+		totalChatsCount: stats[0].chatsTotal,
+		totalTokensCount: stats[0].tokensTotal,
 	};
 }
