@@ -275,5 +275,6 @@ SELECT ai.create_vectorizer(
    'research_articles'::regclass,
     destination => 'research_articles_embeddings',
     embedding => ai.embedding_openai('text-embedding-3-small', 768),
-    chunking => ai.chunking_recursive_character_text_splitter('contents', chunk_size => 1024)
+    chunking => ai.chunking_recursive_character_text_splitter('contents', chunk_size => 1024),
+    indexing => ai.indexing_hnsw(min_rows => 50000, opclass => 'vector_l2_ops')
 );
