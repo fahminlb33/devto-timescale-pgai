@@ -83,6 +83,7 @@ export default function Index() {
 										w={rem(50)}
 										value={icon}
 										onChange={(e) => setIcon(e.currentTarget.value)}
+										maxLength={3}
 									/>
 								</HoverCard.Target>
 								<HoverCard.Dropdown>
