@@ -256,6 +256,8 @@ BEGIN
 	    sel.id, 
 	    sel.title, 
 	    sel.highlights
+    ORDER BY
+        distance
     LIMIT 10;
 END;
 $$;
